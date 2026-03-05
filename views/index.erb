@@ -1,0 +1,17 @@
+<h1>HELLO</h1>
+
+<h2>Alla Band:</h2>
+
+<ul> 
+    <% @bands.each do |bands| %>
+        <li>
+            <a href="/show/<%= bands['id'] %>"><%= bands['name'] %></a>
+        </li>
+    <% end %>
+</ul>
+
+
+
+<a href="/login">Log In</a> <br> 
+<a href="/skapa">Create</a>
+

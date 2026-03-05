@@ -17,12 +17,36 @@ class App < Sinatra::Base
 
     # Routen /
     get '/' do
-        erb :index
+
+      @bands = db.execute('SELECT * FROM bands')
+      erb :index
     end
 
+    get '/skapa' do 
+      erb :create
+    end
+
+    post '/create' do
+      db.execute('INSERT INTO bands (name, genre, started, best_song) VALUES (?,?,?,?)', params.values)
+     redirect('/')
+    end
+
+    get '/login' do 
+      erb :login
+    end
+
+    get '/show/:id' do | id |
+      @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
+      p @bands
+      erb :show
+    end
+
+    post '/delete/:id' do | id |
+      db.execute("DELETE FROM bands WHERE id =?", id)
+      redirect('/')
+    end
+
+    #get '/update' do 
+     # erb
 end
-bfityuofoydofpuf
 
-liugogpgå¨
-
-8go8g

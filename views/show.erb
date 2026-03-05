@@ -1,0 +1,11 @@
+<h3>Detta  är show</h3>
+
+<p><em>Name: </em> <%= @bands['name'] %></p>
+<p><em>Genre: </em> <%= @bands['genre'] %></p>
+<p><em>Started: </em> <%= @bands['started'] %></p>
+<p><em>Best Song : </em> <%= @bands['best_song'] %></p>
+
+<form class="delete" action="/delete/<%=@bands["id"]%>" method="post">
+       		<input type="submit" value="Delete">    <br>
+
+<a href="/">Back to start</a> 
