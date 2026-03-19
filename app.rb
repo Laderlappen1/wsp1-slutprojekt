@@ -46,7 +46,15 @@ class App < Sinatra::Base
       redirect('/')
     end
 
-    #get '/update' do 
-     # erb
+    get '/edit/:id' do | id |
+      @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
+      erb :edit  
+    end
+
+    
+    post '/update/:id' do | id |
+      db.execute('UPDATE bands SET name=?, genre=?, started=?, best_song=? WHERE id=?', [params['name'], params['genre'], params['started'], params['best_song'], id])
+      redirect('/')
+    end
 end
 

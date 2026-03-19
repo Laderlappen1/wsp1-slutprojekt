@@ -1,0 +1,11 @@
+<h2>Byt ut något knas i detta band</h2>
+
+<form action="/update/<%=@bands['id']%>" method="post">
+    <label>Name  <input type="text" name="name" value='<%=@bands['name']%>'></label>
+	<label>Genre <input type="text" name="genre" value="<%=@bands['genre']%>"></label>
+	<label>Started <input type="number" name="started" value='<%=@bands['started']%>'></label>
+    <label>Best Song <input type="text" name="best_song" value='<%=@bands['best_song']%>'></label>
+<input type="submit" value="Spara ändringar">
+</form>
+
+<a href="/">Back to start</a> <br>
