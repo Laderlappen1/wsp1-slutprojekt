@@ -38,6 +38,7 @@ class App < Sinatra::Base
     get '/show/:id' do | id |
       @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
       p @bands
+      @comments = db.execute('SELECT * FROM comments WHERE band_id = ?', id)
       erb :show
     end
 
@@ -55,6 +56,22 @@ class App < Sinatra::Base
     post '/update/:id' do | id |
       db.execute('UPDATE bands SET name=?, genre=?, started=?, best_song=? WHERE id=?', [params['name'], params['genre'], params['started'], params['best_song'], id])
       redirect('/')
+    end
+
+
+    get '/comment/:id' do | id |
+      @comments = db.execute('SELECT * FROM comments WHERE band_id = ?', id)
+        erb :comment
+    end   
+
+    post '/create/comment/:id' do | id |
+      @comment = db.execute('INSERT INTO comments (name) VALUES (?)', params.values)
+     end
+
+    post '/delete/comment/:id' do | id |
+      band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
+      db.execute("DELETE FROM comments WHERE id = ?", id)
+      redirect("/show/#{band_id}")
     end
 end
 

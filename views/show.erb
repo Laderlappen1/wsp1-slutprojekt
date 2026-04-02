@@ -6,8 +6,23 @@
 <p><em>Best Song : </em> <%= @bands['best_song'] %></p>
 
 <form class="delete" action="/delete/<%=@bands["id"]%>" method="post">
-       		<input type="submit" value="Delete">    <br>
+       		<input type="submit" value="Delete"></form>   <br>
 
 <a href="/">Back to start</a> <br>
 
 <a href="/edit/<%=@bands["id"]%>">Edit</a> 
+
+<h3>Alla Kommenterar på detta band</h3>
+<a href="/comment/<%=@bands["id"]%>">Gör en kommentar</a> </br>
+<ul> 
+  <% @comments.each do |comment| %>
+    <li>
+      <p><em>From USER (fix later): </em> <%= comment['comment'] %></p> 
+
+      <form class="delete" action="/delete/comment/<%= comment['id'] %>" method="post">
+        <input type="submit" value="Delete comment">
+      </form>
+    </li>
+  <% end %>
+</ul>
+
