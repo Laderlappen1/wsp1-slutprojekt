@@ -26,7 +26,7 @@ class App < Sinatra::Base
       erb :create
     end
 
-    post '/create' do
+    post '/bands' do
       db.execute('INSERT INTO bands (name, genre, started, best_song) VALUES (?,?,?,?)', params.values)
      redirect('/')
     end
@@ -59,19 +59,104 @@ class App < Sinatra::Base
     end
 
 
-    get '/comment/:id' do | id |
-      @comments = db.execute('SELECT * FROM comments WHERE band_id = ?', id)
-        erb :comment
-    end   
+   get '/comment/:id' do |id|
+  @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
+  erb :comment
+end 
 
-    post '/create/comment/:id' do | id |
-      @comment = db.execute('INSERT INTO comments (name) VALUES (?)', params.values)
-     end
+   post '/comment/:id' do |id|
+  db.execute(
+    'INSERT INTO comments (comment, band_id) VALUES (?, ?)',
+    [params['comment'], id]
+  )
+
+  redirect("/show/#{id}")
+end
 
     post '/delete/comment/:id' do | id |
       band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
       db.execute("DELETE FROM comments WHERE id = ?", id)
       redirect("/show/#{band_id}")
     end
+
+
+# Inlog, users osv 
+
+configure do
+    enable :sessions
+    set :session_secret, SecureRandom.hex(64)
+  end
+
+  before do
+    if session[:user_id]
+      @current_user = db.execute("SELECT * FROM users WHERE id = ?", session[:user_id]).first
+      ap @current_user
+    end
+  end
+
+
+ get '/admin' do
+    if session[:user_id]
+      erb(:"admin/index")
+    else
+      ap "/admin : Access denied."
+      status 401
+      redirect '/acces_denied'
+    end
+  end
+
+  get '/acces_denied' do
+    erb(:acces_denied)
+  end
+
+  get '/login' do
+    erb(:login)
+  end
+
+  post '/login' do
+    request_username = params[:username]
+    request_plain_password = params[:password]
+
+    user = db.execute("SELECT *
+            FROM users
+            WHERE username = ?",
+            request_username).first
+
+    unless user
+      ap "/login : Invalid username."
+      status 401
+      redirect '/acces_denied'
+    end
+
+    db_id = user["id"].to_i
+    db_password_hashed = user["password"].to_s
+
+    # Create a BCrypt object from the hashed password from db
+    bcrypt_db_password = BCrypt::Password.new(db_password_hashed)
+    # Check if the plain password matches the hashed password from db
+    if bcrypt_db_password == request_plain_password
+      ap "/login : Logged in -> redirecting to admin"
+      session[:user_id] = db_id
+      redirect '/admin'
+    else
+      ap "/login : Invalid password."
+      status 401
+      redirect '/acces_denied'
+    end
+  end
+
+  post '/logout' do
+    ap "Logging out"
+    session.clear
+    redirect '/'
+  end
+
+  get '/users/new' do
+    erb(:"users/new")
+  end
+
+
+
+
 end
 

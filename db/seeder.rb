@@ -24,7 +24,7 @@ class Seeder
 
     db.execute('CREATE TABLE users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                username TEXT NOT NULL,
                 password TEXT NOT NULL,
                 user_id INTEGER)')
 
@@ -40,10 +40,11 @@ class Seeder
     
     db.execute('INSERT INTO comments (band_id, comment) VALUES (1, "The first metal band I ever heard, my mother used to turn on Metallica in the car and we would listen to The Black Album. A small step for metal, a big step for me!")')
     db.execute('INSERT INTO comments (band_id, comment) VALUES (1, "Master of Puppets was my favorite and my most played song for about three years. Does not make the cut like the songs I listen to today. But it is still amazing.")')
-
     db.execute('INSERT INTO comments (band_id, comment) VALUES (2, "A newer band that I started to listen to last year. Amazing songs and heavy af. Love that they were the first band to ever play at the Olympics. Continue the great work and let some whales fly from the sky!")')
 
- 
+    db.execute('INSERT INTO users (username, password) VALUES ("Kowalski", "123")')
+
+    
   end
 
   private

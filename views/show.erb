@@ -6,7 +6,7 @@
 <p><em>Best Song : </em> <%= @bands['best_song'] %></p>
 
 <form class="delete" action="/delete/<%=@bands["id"]%>" method="post">
-       		<input type="submit" value="Delete"></form>   <br>
+       		<input type="submit" value="Delete band"></form>   <br>
 
 <a href="/">Back to start</a> <br>
 
@@ -22,7 +22,7 @@
       <form class="delete" action="/delete/comment/<%= comment['id'] %>" method="post">
         <input type="submit" value="Delete comment">
       </form>
-    </li>
+    </li>   
   <% end %>
 </ul>
 

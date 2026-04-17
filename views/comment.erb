@@ -1,0 +1,7 @@
+<h2>Kommentera på <%= @bands['name'] %></h2>
+
+<form action="/comment/<%= @bands['id'] %>" method="post">
+  <label>Your Comment 
+    <input type="text" name="comment">
+  </label> <input type="submit" value="Save comment">
+</form>
