@@ -1,3 +1,5 @@
+
+
 require 'debug'
 require "awesome_print"
 
@@ -23,7 +25,7 @@ class App < Sinatra::Base
     end
 
     get '/skapa' do 
-      erb :create
+      erb :'bands/create'
     end
 
     post '/bands' do
@@ -32,14 +34,14 @@ class App < Sinatra::Base
     end
 
     get '/login' do 
-      erb :login
+      erb :'users/login'
     end
 
     get '/show/:id' do | id |
       @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
       p @bands
       @comments = db.execute('SELECT * FROM comments WHERE band_id = ?', id)
-      erb :show
+      erb :'bands/show'
     end
 
     post '/delete/:id' do | id |
@@ -49,7 +51,7 @@ class App < Sinatra::Base
 
     get '/edit/:id' do | id |
       @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
-      erb :edit  
+      erb :'bands/edit'
     end
 
     
@@ -61,23 +63,36 @@ class App < Sinatra::Base
 
    get '/comment/:id' do |id|
   @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
-  erb :comment
+  erb :'comments/create'
 end 
 
    post '/comment/:id' do |id|
-  db.execute(
-    'INSERT INTO comments (comment, band_id) VALUES (?, ?)',
-    [params['comment'], id]
-  )
-
+  db.execute('INSERT INTO comments (comment, band_id) VALUES (?, ?)',[params['comment'], id])
   redirect("/show/#{id}")
 end
 
-    post '/delete/comment/:id' do | id |
+    post '/delete/:id/comment' do | id |
       band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
       db.execute("DELETE FROM comments WHERE id = ?", id)
       redirect("/show/#{band_id}")
     end
+
+    get '/edit/:id/comment' do |id|
+  @comment = db.execute('SELECT * FROM comments WHERE id = ?', id).first
+  erb :'comments/edit'
+    end
+
+    post '/update/:id/comment' do |id|
+  band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
+
+  db.execute(
+    'UPDATE comments SET comment = ? WHERE id = ?',
+    [params['comment'], id]
+  )
+
+  redirect("/show/#{band_id}")
+end
+
 
 
 # Inlog, users osv 
@@ -154,9 +169,6 @@ configure do
   get '/users/new' do
     erb(:"users/new")
   end
-
-
-
 
 end
 

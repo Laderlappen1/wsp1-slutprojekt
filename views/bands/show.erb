@@ -19,8 +19,10 @@
     <li>
       <p><em>From USER (fix later): </em> <%= comment['comment'] %></p> 
 
-      <form class="delete" action="/delete/comment/<%= comment['id'] %>" method="post">
+      <form class="delete" action="/delete/<%= comment['id'] %>/comment" method="post">
         <input type="submit" value="Delete comment">
+        <a href="/edit/<%= comment['id'] %>/comment">Edit comment</a> </br>
+
       </form>
     </li>   
   <% end %>
