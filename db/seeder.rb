@@ -33,20 +33,21 @@
       db.execute('CREATE TABLE comments (
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   comment TEXT NOT NULL,
-                  band_id INTEGER)')
+                  band_id INTEGER,
+                  user_id INTEGER)')
     end
 
     def self.populate_tables 
       db.execute('INSERT INTO bands (name, genre, started, best_song) VALUES ("Metallica", "Thrash Metal", 1981, "Master of Puppets")')
       db.execute('INSERT INTO bands (name, genre, started, best_song) VALUES ("Gojira", "Metal", 1996, "Sphinx")')
       
-      db.execute('INSERT INTO comments (band_id, comment) VALUES (1, "The first metal band I ever heard, my mother used to turn on Metallica in the car and we would listen to The Black Album. A small step for metal, a big step for me!")')
-      db.execute('INSERT INTO comments (band_id, comment) VALUES (1, "Master of Puppets was my favorite and my most played song for about three years. Does not make the cut like the songs I listen to today. But it is still amazing.")')
-      db.execute('INSERT INTO comments (band_id, comment) VALUES (2, "A newer band that I started to listen to last year. Amazing songs and heavy af. Love that they were the first band to ever play at the Olympics. Continue the great work and let some whales fly from the sky!")')
+      db.execute('INSERT INTO comments (band_id, comment, user_id) VALUES (1, "The first metal band I ever heard, my mother used to turn on Metallica in the car and we would listen to The Black Album. A small step for metal, a big step for me!", 1)')
+      db.execute('INSERT INTO comments (band_id, comment, user_id) VALUES (1, "Master of Puppets was my favorite and my most played song for about three years. Does not make the cut like the songs I listen to today. But it is still amazing.", 1)')
+      db.execute('INSERT INTO comments (band_id, comment, user_id) VALUES (2, "A newer band that I started to listen to last year. Amazing songs and heavy af. Love that they were the first band to ever play at the Olympics. Continue the great work and let some whales fly from the sky!", 1)')
 
 
       password_hashed = BCrypt::Password.create("123")
-          db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["Kowalski", password_hashed])
+      db.execute('INSERT INTO users (username, password) VALUES (?, ?)', ["Kowalski", password_hashed])
 
       
     end

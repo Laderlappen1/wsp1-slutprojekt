@@ -2,7 +2,8 @@
 
 require 'debug'
 require "awesome_print"
-
+require 'bcrypt'
+    
 class App < Sinatra::Base
 
     setup_development_features(self)
@@ -37,61 +38,75 @@ class App < Sinatra::Base
       erb :'users/login'
     end
 
-    get '/show/:id' do | id |
+    get '/bands/:id' do | id |
       @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
       p @bands
-      @comments = db.execute('SELECT * FROM comments WHERE band_id = ?', id)
-      erb :'bands/show'
+      @comments = db.execute("SELECT comments.*, users.username FROM comments JOIN users ON comments.user_id = users.id WHERE band_id = ?", id)    
+        erb :'bands/show'
     end
 
-    post '/delete/:id' do | id |
+    post '/bands/:id/delete' do | id |
       db.execute("DELETE FROM bands WHERE id =?", id)
       redirect('/')
     end
 
-    get '/edit/:id' do | id |
+    get '/bands/:id/edit' do | id |
       @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
       erb :'bands/edit'
     end
 
     
-    post '/update/:id' do | id |
+    post '/bands/:id/update' do | id |
       db.execute('UPDATE bands SET name=?, genre=?, started=?, best_song=? WHERE id=?', [params['name'], params['genre'], params['started'], params['best_song'], id])
       redirect('/')
     end
 
 
-   get '/comment/:id' do |id|
-  @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
-  erb :'comments/create'
-end 
+        post '/comment/:id' do |id|
+      redirect '/login' unless session[:user_id]
 
-   post '/comment/:id' do |id|
-  db.execute('INSERT INTO comments (comment, band_id) VALUES (?, ?)',[params['comment'], id])
-  redirect("/show/#{id}")
-end
+      db.execute(
+        'INSERT INTO comments (comment, band_id, user_id) VALUES (?, ?, ?)',
+        [params['comment'], id, session[:user_id]]
+      )
 
-    post '/delete/:id/comment' do | id |
-      band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
-      db.execute("DELETE FROM comments WHERE id = ?", id)
-      redirect("/show/#{band_id}")
+      redirect("/bands/#{id}")
     end
 
-    get '/edit/:id/comment' do |id|
+    get '/comment/:id' do |id|
+      redirect '/login' unless session[:user_id]
+
+      @bands = db.execute('SELECT * FROM bands WHERE id = ?', id).first
+      erb :'comments/create'
+    end
+
+    post '/comment/:id/delete' do |id|
+  row = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first
+  band_id = row['band_id'] if row
+
+  db.execute("DELETE FROM comments WHERE id = ?", id)
+  redirect("/bands/#{band_id}")
+end
+
+    get '/comment/:id/edit' do |id|
   @comment = db.execute('SELECT * FROM comments WHERE id = ?', id).first
   erb :'comments/edit'
     end
 
-    post '/update/:id/comment' do |id|
-  band_id = db.execute('SELECT band_id FROM comments WHERE id = ?', id).first['band_id']
+      post '/comment/:id/update' do |id|
+      redirect '/login' unless session[:user_id]
 
-  db.execute(
-    'UPDATE comments SET comment = ? WHERE id = ?',
-    [params['comment'], id]
-  )
+      comment = db.execute('SELECT * FROM comments WHERE id = ?', id).first
 
-  redirect("/show/#{band_id}")
-end
+      db.execute(
+        'UPDATE comments SET comment = ? WHERE id = ?',
+        [params['comment'], id]
+      )
+
+      redirect("/bands/#{comment['band_id']}")
+    end
+  
+
 
 
 
@@ -110,7 +125,7 @@ configure do
   end
 
 
- get '/admin' do
+  get '/admin' do
     if session[:user_id]
       erb(:"admin/index")
     else
@@ -152,7 +167,7 @@ configure do
     if bcrypt_db_password == request_plain_password
       ap "/login : Logged in -> redirecting to admin"
       session[:user_id] = db_id
-      redirect '/admin'
+      redirect '/'
     else
       ap "/login : Invalid password."
       status 401
@@ -169,6 +184,20 @@ configure do
   get '/users/new' do
     erb(:"users/new")
   end
+
+
+
+post '/users' do
+  password_hash = BCrypt::Password.create(params['password'])
+
+  db.execute(
+    "INSERT INTO users (username, password) VALUES (?, ?)",
+    [params['username'], password_hash]
+  )
+
+  redirect '/login'
+end
+
 
 end
 

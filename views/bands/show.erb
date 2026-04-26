@@ -5,23 +5,25 @@
 <p><em>Started: </em> <%= @bands['started'] %></p>
 <p><em>Best Song : </em> <%= @bands['best_song'] %></p>
 
-<form class="delete" action="/delete/<%=@bands["id"]%>" method="post">
-       		<input type="submit" value="Delete band"></form>   <br>
+<% if session[:user_id] %>
+  <form class="delete" action="/bands/<%= @bands['id'] %>/delete" method="post">
+    <input type="submit" value="Delete band">
+  </form>
+<% end %>  <br>
 
 <a href="/">Back to start</a> <br>
 
-<a href="/edit/<%=@bands["id"]%>">Edit</a> 
+<a href="/comment/<%=@bands["id"]%>/edit">Edit</a> 
 
 <h3>Alla Kommenterar på detta band</h3>
 <a href="/comment/<%=@bands["id"]%>">Gör en kommentar</a> </br>
 <ul> 
   <% @comments.each do |comment| %>
     <li>
-      <p><em>From USER (fix later): </em> <%= comment['comment'] %></p> 
-
-      <form class="delete" action="/delete/<%= comment['id'] %>/comment" method="post">
+    <p> <em><%= comment['username'] %>:</em>  <%= comment['comment'] %> </p>
+      <form class="delete" action="/comment/<%= comment['id'] %>/delete" method="post">
         <input type="submit" value="Delete comment">
-        <a href="/edit/<%= comment['id'] %>/comment">Edit comment</a> </br>
+        <a href="/comment/<%= comment['id'] %>/edit">Edit comment</a> </br>
 
       </form>
     </li>   

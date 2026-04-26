@@ -5,7 +5,7 @@
 <ul> 
     <% @bands.each do |bands| %>
         <li>
-            <a href="/show/<%= bands['id'] %>"><%= bands['name'] %></a>
+            <a href="/bands/<%= bands['id'] %>"><%= bands['name'] %></a>
         </li>
     <% end %>
 </ul>
